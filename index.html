@@ -36,13 +36,13 @@
           const totalSeats = data.reduce((sum, d) => sum + d.size, 0);
 
           const seats = useMemo(() => {
-            const rows = 7;
-            const seatsPerRow = [13, 17, 21, 25, 29, 33, 37];
-            const innerRadius = 145;
-            const rowSpacing = 25;
+            const rows = 8;
+            const seatsPerRow = [11, 15, 19, 23, 27, 31, 35, 39];
+            const innerRadius = 140;
+            const rowSpacing = 24;
             const centerX = 400;
-            const centerY = 420;
-            const arcAngle = 182;
+            const centerY = 400;
+            const arcAngle = 180;
             
             const allPositions = [];
             for (let row = 0; row < rows; row++) {
@@ -123,8 +123,8 @@
             <div className="w-full h-screen bg-[#2d3139] flex flex-col items-center justify-center p-8">
               <h1 className="text-white text-5xl font-bold mb-12 tracking-wider" style={{ letterSpacing: '0.05em' }}>User Profiling</h1>
 
-              <div className="relative">
-                <svg width="800" height="580" className="overflow-visible">
+              <div className="relative" style={{ minHeight: '580px' }}>
+                <svg width="800" height="580" className="overflow-visible" style={{ display: 'block' }}>
                   {clusterZones.map((zone, idx) => (
                     <rect
                       key={`zone-${idx}`}
@@ -156,7 +156,7 @@
 
                   <text
                     x="400"
-                    y="425"
+                    y="405"
                     textAnchor="middle"
                     className="fill-white select-none pointer-events-none"
                     style={{ 
@@ -171,7 +171,7 @@
                   {hoveredCluster && (
                     <text
                       x="400"
-                      y="455"
+                      y="435"
                       textAnchor="middle"
                       className="fill-white select-none pointer-events-none"
                       style={{ fontSize: '13px' }}
@@ -182,7 +182,7 @@
                 </svg>
               </div>
 
-              <div className="mt-8 w-full max-w-3xl">
+              <div className="mt-12 w-full max-w-3xl" style={{ marginTop: '3rem' }}>
                 <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-600">
                   <h2 className="text-white text-sm font-semibold tracking-wide">Cluster</h2>
                   <h2 className="text-white text-sm font-semibold tracking-wide">Cluster Size</h2>
