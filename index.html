@@ -13,7 +13,11 @@
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
+            min-height: 100vh;
+            background-color: #2d3139;
+        }
+        #root {
+            min-height: 100vh;
         }
     </style>
 </head>
@@ -36,18 +40,19 @@
           const totalSeats = data.reduce((sum, d) => sum + d.size, 0);
 
           const seats = useMemo(() => {
-            const rows = 8;
-            const seatsPerRow = [11, 15, 19, 23, 27, 31, 35, 39];
-            const innerRadius = 140;
-            const rowSpacing = 24;
+            const rows = 7;
+            const innerRadius = 150;
+            const rowSpacing = 26;
             const centerX = 400;
-            const centerY = 400;
+            const centerY = 380;
             const arcAngle = 180;
             
             const allPositions = [];
+            
             for (let row = 0; row < rows; row++) {
               const radius = innerRadius + row * rowSpacing;
-              const seatsInThisRow = seatsPerRow[row];
+              const circumference = Math.PI * radius;
+              const seatsInThisRow = Math.round(circumference / 22);
               
               for (let seat = 0; seat < seatsInThisRow; seat++) {
                 const angle = 180 - (seat / (seatsInThisRow - 1)) * arcAngle;
@@ -59,7 +64,7 @@
                   x,
                   y,
                   angle,
-                  radius: 10.5
+                  radius: 10
                 });
               }
             }
@@ -69,7 +74,7 @@
             let currentClusterIndex = 0;
             let seatsAssignedInCurrentCluster = 0;
             
-            const seatsWithClusters = allPositions.map((pos, idx) => {
+            const seatsWithClusters = allPositions.slice(0, totalSeats).map((pos, idx) => {
               while (seatsAssignedInCurrentCluster >= data[currentClusterIndex].size && currentClusterIndex < data.length - 1) {
                 currentClusterIndex++;
                 seatsAssignedInCurrentCluster = 0;
@@ -120,11 +125,25 @@
           }, [seats, data]);
 
           return (
-            <div className="w-full h-screen bg-[#2d3139] flex flex-col items-center justify-center p-8">
-              <h1 className="text-white text-5xl font-bold mb-12 tracking-wider" style={{ letterSpacing: '0.05em' }}>User Profiling</h1>
+            <div style={{ 
+              minHeight: '100vh', 
+              backgroundColor: '#2d3139', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              padding: '2rem',
+              paddingBottom: '4rem'
+            }}>
+              <h1 style={{ 
+                color: 'white', 
+                fontSize: '3rem', 
+                fontWeight: 'bold', 
+                marginBottom: '2rem',
+                letterSpacing: '0.05em'
+              }}>User Profiling</h1>
 
-              <div className="relative" style={{ minHeight: '580px' }}>
-                <svg width="800" height="580" className="overflow-visible" style={{ display: 'block' }}>
+              <div style={{ marginBottom: '3rem' }}>
+                <svg width="800" height="500" style={{ display: 'block' }}>
                   {clusterZones.map((zone, idx) => (
                     <rect
                       key={`zone-${idx}`}
@@ -133,7 +152,7 @@
                       width={zone.width}
                       height={zone.height}
                       fill="transparent"
-                      className="cursor-pointer"
+                      style={{ cursor: 'pointer' }}
                       onMouseEnter={() => setHoveredCluster(zone.cluster)}
                       onMouseLeave={() => setHoveredCluster(null)}
                     />
@@ -147,22 +166,25 @@
                       r={seat.radius}
                       fill={seat.color}
                       opacity={hoveredCluster === null || hoveredCluster === seat.cluster ? 1 : 0.3}
-                      className="transition-all duration-200 pointer-events-none"
                       style={{
-                        filter: hoveredCluster === seat.cluster ? 'brightness(1.15)' : 'none'
+                        transition: 'all 0.2s',
+                        filter: hoveredCluster === seat.cluster ? 'brightness(1.15)' : 'none',
+                        pointerEvents: 'none'
                       }}
                     />
                   ))}
 
                   <text
                     x="400"
-                    y="405"
+                    y="385"
                     textAnchor="middle"
-                    className="fill-white select-none pointer-events-none"
                     style={{ 
                       fontFamily: 'Arial, sans-serif', 
                       fontWeight: 700,
-                      fontSize: '96px'
+                      fontSize: '96px',
+                      fill: 'white',
+                      userSelect: 'none',
+                      pointerEvents: 'none'
                     }}
                   >
                     {centerInfo.size}
@@ -171,10 +193,14 @@
                   {hoveredCluster && (
                     <text
                       x="400"
-                      y="435"
+                      y="415"
                       textAnchor="middle"
-                      className="fill-white select-none pointer-events-none"
-                      style={{ fontSize: '13px' }}
+                      style={{ 
+                        fontSize: '13px',
+                        fill: 'white',
+                        userSelect: 'none',
+                        pointerEvents: 'none'
+                      }}
                     >
                       {centerInfo.name}
                     </text>
@@ -182,29 +208,61 @@
                 </svg>
               </div>
 
-              <div className="mt-12 w-full max-w-3xl" style={{ marginTop: '3rem' }}>
-                <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-600">
-                  <h2 className="text-white text-sm font-semibold tracking-wide">Cluster</h2>
-                  <h2 className="text-white text-sm font-semibold tracking-wide">Cluster Size</h2>
+              <div style={{ 
+                width: '100%', 
+                maxWidth: '800px',
+                marginTop: '2rem'
+              }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  marginBottom: '1rem',
+                  paddingBottom: '0.5rem',
+                  borderBottom: '1px solid #6b7280'
+                }}>
+                  <h2 style={{ 
+                    color: 'white', 
+                    fontSize: '0.875rem', 
+                    fontWeight: 600,
+                    letterSpacing: '0.025em'
+                  }}>Cluster</h2>
+                  <h2 style={{ 
+                    color: 'white', 
+                    fontSize: '0.875rem', 
+                    fontWeight: 600,
+                    letterSpacing: '0.025em'
+                  }}>Cluster Size</h2>
                 </div>
                 {data.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex justify-between items-center py-2.5 px-2 rounded cursor-pointer transition-all duration-150"
                     style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '0.625rem 0.5rem',
+                      borderRadius: '0.25rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
                       backgroundColor: hoveredCluster === item.cluster ? 'rgba(255,255,255,0.08)' : 'transparent'
                     }}
                     onMouseEnter={() => setHoveredCluster(item.cluster)}
                     onMouseLeave={() => setHoveredCluster(null)}
                   >
-                    <div className="flex items-center gap-3">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <div
-                        className="w-3 h-3 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: item.color }}
+                        style={{ 
+                          width: '12px', 
+                          height: '12px', 
+                          borderRadius: '50%',
+                          backgroundColor: item.color,
+                          flexShrink: 0
+                        }}
                       />
-                      <span className="text-white text-sm">{item.cluster}</span>
+                      <span style={{ color: 'white', fontSize: '0.875rem' }}>{item.cluster}</span>
                     </div>
-                    <span className="text-white text-sm font-medium">{item.size}</span>
+                    <span style={{ color: 'white', fontSize: '0.875rem', fontWeight: 500 }}>{item.size}</span>
                   </div>
                 ))}
               </div>
