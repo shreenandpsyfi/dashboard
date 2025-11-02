@@ -78,21 +78,22 @@
           const totalSeats = data.reduce((sum, d) => sum + d.size, 0);
 
           const seats = useMemo(() => {
-            const rows = 7;
-            const innerRadius = 150;
-            const rowSpacing = 26;
+            const rows = 8;
+            const innerRadius = 130;
+            const rowSpacing = 24;
             const centerX = 400;
-            const centerY = 400;
+            const centerY = 370;
             
             const allPositions = [];
             
             for (let row = 0; row < rows; row++) {
               const radius = innerRadius + row * rowSpacing;
-              const circumference = Math.PI * radius;
-              const seatsInThisRow = Math.round(circumference / 22);
+              // Calculate seats based on semicircle arc for even distribution
+              const arcLength = Math.PI * radius;
+              const seatsInThisRow = Math.floor(arcLength / 19);
               
               for (let seat = 0; seat < seatsInThisRow; seat++) {
-                // PERFECT 180° SEMICIRCLE: angle from 180° (left) to 0° (right)
+                // PERFECT 180° - endpoints at SAME Y level (flat baseline)
                 const angle = 180 - (seat / (seatsInThisRow - 1)) * 180;
                 const radian = (angle * Math.PI) / 180;
                 const x = centerX + radius * Math.cos(radian);
@@ -334,13 +335,14 @@
                   <div 
                     className="profile-card"
                     style={{
-                      backgroundColor: '#1f2937',
-                      borderRadius: '1rem',
+                      backgroundColor: '#1a1d26',
+                      borderRadius: '1.5rem',
                       padding: '3rem',
-                      maxWidth: '600px',
+                      maxWidth: '650px',
                       width: '100%',
-                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-                      border: `3px solid ${selectedCluster.color}`
+                      boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px ${selectedCluster.color}40`,
+                      border: `2px solid ${selectedCluster.color}`,
+                      background: `linear-gradient(135deg, #1a1d26 0%, ${selectedCluster.color}10 100%)`
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -424,18 +426,25 @@
                       onClick={() => setSelectedCluster(null)}
                       style={{
                         width: '100%',
-                        padding: '0.75rem',
-                        backgroundColor: selectedCluster.color,
+                        padding: '1rem',
+                        background: `linear-gradient(135deg, ${selectedCluster.color} 0%, ${selectedCluster.color}cc 100%)`,
                         color: 'white',
                         border: 'none',
-                        borderRadius: '0.5rem',
+                        borderRadius: '0.75rem',
                         fontSize: '1rem',
                         fontWeight: 600,
                         cursor: 'pointer',
-                        transition: 'all 0.2s'
+                        transition: 'all 0.2s',
+                        boxShadow: `0 4px 12px ${selectedCluster.color}40`
                       }}
-                      onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-                      onMouseLeave={(e) => e.target.style.opacity = '1'}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = `0 6px 20px ${selectedCluster.color}60`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = `0 4px 12px ${selectedCluster.color}40`;
+                      }}
                     >
                       Close
                     </button>
@@ -446,7 +455,6 @@
           );
         };
 
--
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<ParliamentChart />);
     </script>
