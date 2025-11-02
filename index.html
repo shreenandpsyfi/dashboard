@@ -37,36 +37,36 @@
           const [data, setData] = useState([
             { 
               cluster: 'The Pragmatic Optimiser', 
-              size: 74, 
-              color: '#B85C68',
+              size: 75, 
+              color: '#843356',
               description: 'Pragmatic Optimisers are solution-oriented individuals who balance realism with a positive outlook. They focus on practical outcomes while maintaining hope for better results.',
               traits: ['Solution-focused', 'Realistic yet hopeful', 'Action-oriented', 'Adaptable']
             },
             { 
               cluster: 'The Emotionally Engaged', 
               size: 27, 
-              color: '#6B3948',
+              color: '#CE575D',
               description: 'Emotionally Engaged individuals deeply connect with their feelings and the emotions of others. They bring empathy and emotional intelligence to every situation.',
               traits: ['Highly empathetic', 'Emotionally aware', 'Relationship-focused', 'Intuitive']
             },
             { 
               cluster: 'The Clarity Seeking Professional', 
               size: 33, 
-              color: '#D87050',
+              color: '#FF6F61',
               description: 'Clarity Seeking Professionals prioritize clear communication and well-defined goals. They excel in structured environments and value transparency.',
               traits: ['Detail-oriented', 'Process-driven', 'Clear communicator', 'Goal-focused']
             },
             { 
               cluster: 'The Grounded Go-Getter', 
               size: 33, 
-              color: '#8B68B8',
+              color: '#802F9D',
               description: 'Grounded Go-Getters combine ambition with practicality. They pursue their goals with determination while staying connected to reality.',
               traits: ['Ambitious', 'Practical', 'Determined', 'Results-driven']
             },
             { 
               cluster: 'The Pattern Breaker', 
               size: 18, 
-              color: '#B8A0C0',
+              color: '#EBD2F9',
               description: 'Pattern Breakers challenge conventional thinking and embrace innovation. They see opportunities where others see obstacles.',
               traits: ['Innovative', 'Non-conformist', 'Creative thinker', 'Risk-taker']
             }
@@ -78,22 +78,22 @@
           const totalSeats = data.reduce((sum, d) => sum + d.size, 0);
 
           const seats = useMemo(() => {
-            const rows = 8;
-            const innerRadius = 130;
-            const rowSpacing = 24;
+            // PERFECT 180° SEMICIRCLE - 6 rows instead of 7 for better distribution
+            const rows = 6;
+            const seatsPerRow = [13, 17, 21, 26, 31, 37]; // Fixed seats per row for even distribution
+            const innerRadius = 160;
+            const rowSpacing = 30;
             const centerX = 400;
-            const centerY = 370;
+            const centerY = 420;
             
             const allPositions = [];
             
             for (let row = 0; row < rows; row++) {
               const radius = innerRadius + row * rowSpacing;
-              // Calculate seats based on semicircle arc for even distribution
-              const arcLength = Math.PI * radius;
-              const seatsInThisRow = Math.floor(arcLength / 19);
+              const seatsInThisRow = seatsPerRow[row];
               
               for (let seat = 0; seat < seatsInThisRow; seat++) {
-                // PERFECT 180° - endpoints at SAME Y level (flat baseline)
+                // PERFECT 180° angle: from 180° (left) to 0° (right)
                 const angle = 180 - (seat / (seatsInThisRow - 1)) * 180;
                 const radian = (angle * Math.PI) / 180;
                 const x = centerX + radius * Math.cos(radian);
@@ -103,13 +103,15 @@
                   x,
                   y,
                   angle,
-                  radius: 10
+                  radius: 11
                 });
               }
             }
             
+            // Sort by angle LEFT to RIGHT
             allPositions.sort((a, b) => b.angle - a.angle);
             
+            // Assign clusters LEFT to RIGHT
             let currentClusterIndex = 0;
             let seatsAssignedInCurrentCluster = 0;
             
@@ -188,7 +190,7 @@
               }}>User Profiling</h1>
 
               <div style={{ marginBottom: '3rem' }}>
-                <svg width="800" height="500" style={{ display: 'block' }}>
+                <svg width="800" height="550" style={{ display: 'block' }}>
                   {clusterZones.map((zone, idx) => (
                     <rect
                       key={`zone-${idx}`}
@@ -222,7 +224,7 @@
 
                   <text
                     x="400"
-                    y="405"
+                    y="425"
                     textAnchor="middle"
                     style={{ 
                       fontFamily: 'Arial, sans-serif', 
@@ -239,7 +241,7 @@
                   {hoveredCluster && (
                     <text
                       x="400"
-                      y="435"
+                      y="455"
                       textAnchor="middle"
                       style={{ 
                         fontSize: '13px',
@@ -335,14 +337,14 @@
                   <div 
                     className="profile-card"
                     style={{
-                      backgroundColor: '#1a1d26',
-                      borderRadius: '1.5rem',
+                      backgroundColor: '#1a1f2e',
+                      borderRadius: '1rem',
                       padding: '3rem',
-                      maxWidth: '650px',
+                      maxWidth: '600px',
                       width: '100%',
-                      boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px ${selectedCluster.color}40`,
-                      border: `2px solid ${selectedCluster.color}`,
-                      background: `linear-gradient(135deg, #1a1d26 0%, ${selectedCluster.color}10 100%)`
+                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                      border: `3px solid ${selectedCluster.color}`,
+                      background: `linear-gradient(135deg, #1a1f2e 0%, #252b3d 100%)`
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -426,25 +428,18 @@
                       onClick={() => setSelectedCluster(null)}
                       style={{
                         width: '100%',
-                        padding: '1rem',
-                        background: `linear-gradient(135deg, ${selectedCluster.color} 0%, ${selectedCluster.color}cc 100%)`,
+                        padding: '0.75rem',
+                        backgroundColor: selectedCluster.color,
                         color: 'white',
                         border: 'none',
-                        borderRadius: '0.75rem',
+                        borderRadius: '0.5rem',
                         fontSize: '1rem',
                         fontWeight: 600,
                         cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        boxShadow: `0 4px 12px ${selectedCluster.color}40`
+                        transition: 'all 0.2s'
                       }}
-                      onMouseEnter={(e) => {
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.boxShadow = `0 6px 20px ${selectedCluster.color}60`;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.boxShadow = `0 4px 12px ${selectedCluster.color}40`;
-                      }}
+                      onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+                      onMouseLeave={(e) => e.target.style.opacity = '1'}
                     >
                       Close
                     </button>
