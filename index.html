@@ -37,38 +37,58 @@
           const [data, setData] = useState([
             { 
               cluster: 'The Pragmatic Optimiser', 
-              size: 75, 
+              size: 74, 
               color: '#843356',
-              description: 'Pragmatic Optimisers are solution-oriented individuals who balance realism with a positive outlook. They focus on practical outcomes while maintaining hope for better results.',
-              traits: ['Solution-focused', 'Realistic yet hopeful', 'Action-oriented', 'Adaptable']
+              age: '48 years old',
+              profession: 'Senior Professional',
+              tagline: 'Clear mind. Sharp focus. No fluff.',
+              traits: ['Late adopters after validation', 'Mental clarity seekers', 'Not emotionally exploratory', 'Open, but not early adopters'],
+              messaging: '"You optimise your body. Why not your mind?"',
+              trustSignal: 'Scientific Research and Clinical Validation'
             },
             { 
               cluster: 'The Emotionally Engaged', 
               size: 27, 
               color: '#CE575D',
-              description: 'Emotionally Engaged individuals deeply connect with their feelings and the emotions of others. They bring empathy and emotional intelligence to every situation.',
-              traits: ['Highly empathetic', 'Emotionally aware', 'Relationship-focused', 'Intuitive']
+              age: '24 years old',
+              profession: 'Entry-level Professional',
+              tagline: 'Feel it. Face it. Grow through it.',
+              traits: ['Immediate adopters', 'Emotional reset seekers', 'Actively using/have used mental health tools', 'High adoption readiness'],
+              messaging: '"You optimise your body. Why not your mind?" | "This isn\'t therapy. No talking, no pressure - just mental training for daily life"',
+              trustSignal: 'Scientific Research and Clinical Validation and Mental Health Expert Recommendation'
             },
             { 
               cluster: 'The Clarity Seeking Professional', 
               size: 33, 
               color: '#FF6F61',
-              description: 'Clarity Seeking Professionals prioritize clear communication and well-defined goals. They excel in structured environments and value transparency.',
-              traits: ['Detail-oriented', 'Process-driven', 'Clear communicator', 'Goal-focused']
+              age: '52 years old',
+              profession: 'Senior Professional',
+              tagline: 'Clear mind. Confident self. Backed by science.',
+              traits: ['Immediate adopters', 'Mental clarity seekers', 'Actively using/have used mental health tools', 'High adoption readiness'],
+              messaging: '"Discover the power of a clear mind and the ripple effects across your life"',
+              trustSignal: 'Scientific Research and Clinical Validation'
             },
             { 
               cluster: 'The Grounded Go-Getter', 
               size: 33, 
               color: '#802F9D',
-              description: 'Grounded Go-Getters combine ambition with practicality. They pursue their goals with determination while staying connected to reality.',
-              traits: ['Ambitious', 'Practical', 'Determined', 'Results-driven']
+              age: '50 years old',
+              profession: 'Senior Professional',
+              tagline: 'Reset your mind. Reclaim your day.',
+              traits: ['Mid-term adopters', 'Emotional reset seekers', 'Open and adoption-ready', 'Moderate emotional awareness'],
+              messaging: '"Break the cycle: Whether it\'s endless scrolling, emotional overeating, or snapping at loved ones"',
+              trustSignal: 'Recommendation by a friend, relative, or peer'
             },
             { 
               cluster: 'The Pattern Breaker', 
               size: 18, 
               color: '#EBD2F9',
-              description: 'Pattern Breakers challenge conventional thinking and embrace innovation. They see opportunities where others see obstacles.',
-              traits: ['Innovative', 'Non-conformist', 'Creative thinker', 'Risk-taker']
+              age: '28 years old',
+              profession: 'Early Career Professional',
+              tagline: 'Break the loop. Build a better you.',
+              traits: ['Mid-term adopters', 'Behavioural change seekers', 'High adoption willingness', 'Moderate emotional awareness'],
+              messaging: '"You optimise your body. Why not your mind?" | "Break the cycle: Whether it\'s endless scrolling, emotional overeating, or snapping at loved ones"',
+              trustSignal: 'No significant trust signals'
             }
           ]);
 
@@ -78,13 +98,13 @@
           const totalSeats = data.reduce((sum, d) => sum + d.size, 0);
 
           const seats = useMemo(() => {
-            // PERFECT 180° SEMICIRCLE - 6 rows instead of 7 for better distribution
+            // PERFECT 180° SEMICIRCLE - 6 rows for balanced, straight semicircle
             const rows = 6;
-            const seatsPerRow = [13, 17, 21, 26, 31, 37]; // Fixed seats per row for even distribution
-            const innerRadius = 160;
+            const seatsPerRow = [20, 24, 28, 33, 38, 44]; // Total = 187 seats
+            const innerRadius = 170;
             const rowSpacing = 30;
             const centerX = 400;
-            const centerY = 420;
+            const centerY = 440;
             
             const allPositions = [];
             
@@ -103,37 +123,37 @@
                   x,
                   y,
                   angle,
-                  radius: 11
+                  radius: 10
                 });
               }
             }
             
-            // Sort by angle LEFT to RIGHT
+            // Sort by angle LEFT to RIGHT (180° to 0°)
             allPositions.sort((a, b) => b.angle - a.angle);
             
-            // Assign clusters LEFT to RIGHT
-            let currentClusterIndex = 0;
-            let seatsAssignedInCurrentCluster = 0;
+            // Assign clusters LEFT to RIGHT sequentially
+            const seatsWithClusters = [];
+            let seatIndex = 0;
             
-            const seatsWithClusters = allPositions.slice(0, totalSeats).map((pos, idx) => {
-              while (seatsAssignedInCurrentCluster >= data[currentClusterIndex].size && currentClusterIndex < data.length - 1) {
-                currentClusterIndex++;
-                seatsAssignedInCurrentCluster = 0;
+            // Assign each cluster's seats in order from LEFT to RIGHT
+            for (let clusterIdx = 0; clusterIdx < data.length; clusterIdx++) {
+              const cluster = data[clusterIdx];
+              
+              for (let i = 0; i < cluster.size; i++) {
+                if (seatIndex < allPositions.length) {
+                  seatsWithClusters.push({
+                    ...allPositions[seatIndex],
+                    cluster: cluster.cluster,
+                    color: cluster.color,
+                    size: cluster.size
+                  });
+                  seatIndex++;
+                }
               }
-              
-              const cluster = data[currentClusterIndex];
-              seatsAssignedInCurrentCluster++;
-              
-              return {
-                ...pos,
-                cluster: cluster.cluster,
-                color: cluster.color,
-                size: cluster.size
-              };
-            });
+            }
             
             return seatsWithClusters;
-          }, [data, totalSeats]);
+          }, [data]);
 
           const centerInfo = useMemo(() => {
             if (hoveredCluster) {
@@ -224,7 +244,7 @@
 
                   <text
                     x="400"
-                    y="425"
+                    y="445"
                     textAnchor="middle"
                     style={{ 
                       fontFamily: 'Arial, sans-serif', 
@@ -241,7 +261,7 @@
                   {hoveredCluster && (
                     <text
                       x="400"
-                      y="455"
+                      y="475"
                       textAnchor="middle"
                       style={{ 
                         fontSize: '13px',
@@ -352,8 +372,8 @@
                     <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                       <div style={{
                         display: 'inline-block',
-                        width: '60px',
-                        height: '60px',
+                        width: '80px',
+                        height: '80px',
                         borderRadius: '50%',
                         backgroundColor: selectedCluster.color,
                         marginBottom: '1rem'
@@ -362,35 +382,28 @@
                         color: 'white',
                         fontSize: '2rem',
                         fontWeight: 'bold',
-                        marginBottom: '0.5rem'
+                        marginBottom: '0.5rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
                       }}>
                         {selectedCluster.cluster}
                       </h2>
                       <p style={{
                         color: '#9ca3af',
-                        fontSize: '1.125rem',
-                        fontWeight: 600
-                      }}>
-                        {selectedCluster.size} Participants
-                      </p>
-                    </div>
-
-                    {/* Description */}
-                    <div style={{ marginBottom: '2rem' }}>
-                      <h3 style={{
-                        color: 'white',
-                        fontSize: '1.125rem',
-                        fontWeight: 600,
-                        marginBottom: '0.75rem'
-                      }}>
-                        Overview
-                      </h3>
-                      <p style={{
-                        color: '#d1d5db',
                         fontSize: '1rem',
-                        lineHeight: '1.6'
+                        fontWeight: 500,
+                        marginBottom: '0.25rem'
                       }}>
-                        {selectedCluster.description}
+                        {selectedCluster.age} | {selectedCluster.profession}
+                      </p>
+                      <p style={{
+                        color: 'white',
+                        fontSize: '1.25rem',
+                        fontWeight: 600,
+                        fontStyle: 'italic',
+                        marginTop: '0.75rem'
+                      }}>
+                        {selectedCluster.tagline}
                       </p>
                     </div>
 
@@ -404,23 +417,69 @@
                       }}>
                         Key Traits
                       </h3>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         {selectedCluster.traits.map((trait, idx) => (
-                          <span
+                          <div
                             key={idx}
                             style={{
-                              backgroundColor: selectedCluster.color,
-                              color: 'white',
-                              padding: '0.5rem 1rem',
-                              borderRadius: '9999px',
-                              fontSize: '0.875rem',
-                              fontWeight: 500
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem'
                             }}
                           >
-                            {trait}
-                          </span>
+                            <span style={{
+                              color: selectedCluster.color,
+                              fontSize: '1.25rem',
+                              fontWeight: 'bold'
+                            }}>•</span>
+                            <span style={{
+                              color: '#d1d5db',
+                              fontSize: '0.9rem'
+                            }}>
+                              {trait}
+                            </span>
+                          </div>
                         ))}
                       </div>
+                    </div>
+
+                    {/* Messaging Preference */}
+                    <div style={{ marginBottom: '2rem' }}>
+                      <h3 style={{
+                        color: 'white',
+                        fontSize: '1.125rem',
+                        fontWeight: 600,
+                        marginBottom: '0.75rem'
+                      }}>
+                        Messaging Preference
+                      </h3>
+                      <p style={{
+                        color: '#d1d5db',
+                        fontSize: '0.95rem',
+                        lineHeight: '1.6',
+                        fontStyle: 'italic'
+                      }}>
+                        {selectedCluster.messaging}
+                      </p>
+                    </div>
+
+                    {/* Trust Signal */}
+                    <div style={{ marginBottom: '2rem' }}>
+                      <h3 style={{
+                        color: 'white',
+                        fontSize: '1.125rem',
+                        fontWeight: 600,
+                        marginBottom: '0.75rem'
+                      }}>
+                        Trust Signal
+                      </h3>
+                      <p style={{
+                        color: '#d1d5db',
+                        fontSize: '0.95rem',
+                        lineHeight: '1.6'
+                      }}>
+                        {selectedCluster.trustSignal}
+                      </p>
                     </div>
 
                     {/* Close Button */}
