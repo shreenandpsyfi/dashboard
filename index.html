@@ -19,6 +19,13 @@
         #root {
             min-height: 100vh;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .profile-card {
+            animation: fadeIn 0.3s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -28,14 +35,45 @@
 
         const ParliamentChart = () => {
           const [data, setData] = useState([
-            { cluster: 'The Pragmatic Optimiser', size: 74, color: '#B85860' },
-            { cluster: 'The Emotionally Engaged', size: 27, color: '#7A4458' },
-            { cluster: 'The Clarity Seeking Professional', size: 33, color: '#E07856' },
-            { cluster: 'The Grounded Go-Getter', size: 33, color: '#9370DB' },
-            { cluster: 'The Pattern Breaker', size: 18, color: '#D4BADB' }
+            { 
+              cluster: 'The Pragmatic Optimiser', 
+              size: 74, 
+              color: '#B85C68',
+              description: 'Pragmatic Optimisers are solution-oriented individuals who balance realism with a positive outlook. They focus on practical outcomes while maintaining hope for better results.',
+              traits: ['Solution-focused', 'Realistic yet hopeful', 'Action-oriented', 'Adaptable']
+            },
+            { 
+              cluster: 'The Emotionally Engaged', 
+              size: 27, 
+              color: '#6B3948',
+              description: 'Emotionally Engaged individuals deeply connect with their feelings and the emotions of others. They bring empathy and emotional intelligence to every situation.',
+              traits: ['Highly empathetic', 'Emotionally aware', 'Relationship-focused', 'Intuitive']
+            },
+            { 
+              cluster: 'The Clarity Seeking Professional', 
+              size: 33, 
+              color: '#D87050',
+              description: 'Clarity Seeking Professionals prioritize clear communication and well-defined goals. They excel in structured environments and value transparency.',
+              traits: ['Detail-oriented', 'Process-driven', 'Clear communicator', 'Goal-focused']
+            },
+            { 
+              cluster: 'The Grounded Go-Getter', 
+              size: 33, 
+              color: '#8B68B8',
+              description: 'Grounded Go-Getters combine ambition with practicality. They pursue their goals with determination while staying connected to reality.',
+              traits: ['Ambitious', 'Practical', 'Determined', 'Results-driven']
+            },
+            { 
+              cluster: 'The Pattern Breaker', 
+              size: 18, 
+              color: '#B8A0C0',
+              description: 'Pattern Breakers challenge conventional thinking and embrace innovation. They see opportunities where others see obstacles.',
+              traits: ['Innovative', 'Non-conformist', 'Creative thinker', 'Risk-taker']
+            }
           ]);
 
           const [hoveredCluster, setHoveredCluster] = useState(null);
+          const [selectedCluster, setSelectedCluster] = useState(null);
 
           const totalSeats = data.reduce((sum, d) => sum + d.size, 0);
 
@@ -44,10 +82,7 @@
             const innerRadius = 150;
             const rowSpacing = 26;
             const centerX = 400;
-            const centerY = 380;
-            const arcAngle = 180;
-            const startAngle = 180;
-            const endAngle = 0;
+            const centerY = 400;
             
             const allPositions = [];
             
@@ -57,7 +92,8 @@
               const seatsInThisRow = Math.round(circumference / 22);
               
               for (let seat = 0; seat < seatsInThisRow; seat++) {
-                const angle = 180 - (seat / (seatsInThisRow - 1)) * arcAngle;
+                // PERFECT 180° SEMICIRCLE: angle from 180° (left) to 0° (right)
+                const angle = 180 - (seat / (seatsInThisRow - 1)) * 180;
                 const radian = (angle * Math.PI) / 180;
                 const x = centerX + radius * Math.cos(radian);
                 const y = centerY - radius * Math.sin(radian);
@@ -126,6 +162,11 @@
             return zones;
           }, [seats, data]);
 
+          const handleClusterClick = (clusterName) => {
+            const cluster = data.find(d => d.cluster === clusterName);
+            setSelectedCluster(cluster);
+          };
+
           return (
             <div style={{ 
               minHeight: '100vh', 
@@ -134,7 +175,8 @@
               flexDirection: 'column', 
               alignItems: 'center', 
               padding: '2rem',
-              paddingBottom: '4rem'
+              paddingBottom: '4rem',
+              position: 'relative'
             }}>
               <h1 style={{ 
                 color: 'white', 
@@ -157,6 +199,7 @@
                       style={{ cursor: 'pointer' }}
                       onMouseEnter={() => setHoveredCluster(zone.cluster)}
                       onMouseLeave={() => setHoveredCluster(null)}
+                      onClick={() => handleClusterClick(zone.cluster)}
                     />
                   ))}
                   
@@ -178,7 +221,7 @@
 
                   <text
                     x="400"
-                    y="385"
+                    y="405"
                     textAnchor="middle"
                     style={{ 
                       fontFamily: 'Arial, sans-serif', 
@@ -195,7 +238,7 @@
                   {hoveredCluster && (
                     <text
                       x="400"
-                      y="415"
+                      y="435"
                       textAnchor="middle"
                       style={{ 
                         fontSize: '13px',
@@ -251,6 +294,7 @@
                     }}
                     onMouseEnter={() => setHoveredCluster(item.cluster)}
                     onMouseLeave={() => setHoveredCluster(null)}
+                    onClick={() => handleClusterClick(item.cluster)}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <div
@@ -268,10 +312,141 @@
                   </div>
                 ))}
               </div>
+
+              {/* Profile Card Modal */}
+              {selectedCluster && (
+                <div 
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: '2rem'
+                  }}
+                  onClick={() => setSelectedCluster(null)}
+                >
+                  <div 
+                    className="profile-card"
+                    style={{
+                      backgroundColor: '#1f2937',
+                      borderRadius: '1rem',
+                      padding: '3rem',
+                      maxWidth: '600px',
+                      width: '100%',
+                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                      border: `3px solid ${selectedCluster.color}`
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                      <div style={{
+                        display: 'inline-block',
+                        width: '60px',
+                        height: '60px',
+                        borderRadius: '50%',
+                        backgroundColor: selectedCluster.color,
+                        marginBottom: '1rem'
+                      }} />
+                      <h2 style={{
+                        color: 'white',
+                        fontSize: '2rem',
+                        fontWeight: 'bold',
+                        marginBottom: '0.5rem'
+                      }}>
+                        {selectedCluster.cluster}
+                      </h2>
+                      <p style={{
+                        color: '#9ca3af',
+                        fontSize: '1.125rem',
+                        fontWeight: 600
+                      }}>
+                        {selectedCluster.size} Participants
+                      </p>
+                    </div>
+
+                    {/* Description */}
+                    <div style={{ marginBottom: '2rem' }}>
+                      <h3 style={{
+                        color: 'white',
+                        fontSize: '1.125rem',
+                        fontWeight: 600,
+                        marginBottom: '0.75rem'
+                      }}>
+                        Overview
+                      </h3>
+                      <p style={{
+                        color: '#d1d5db',
+                        fontSize: '1rem',
+                        lineHeight: '1.6'
+                      }}>
+                        {selectedCluster.description}
+                      </p>
+                    </div>
+
+                    {/* Key Traits */}
+                    <div style={{ marginBottom: '2rem' }}>
+                      <h3 style={{
+                        color: 'white',
+                        fontSize: '1.125rem',
+                        fontWeight: 600,
+                        marginBottom: '0.75rem'
+                      }}>
+                        Key Traits
+                      </h3>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        {selectedCluster.traits.map((trait, idx) => (
+                          <span
+                            key={idx}
+                            style={{
+                              backgroundColor: selectedCluster.color,
+                              color: 'white',
+                              padding: '0.5rem 1rem',
+                              borderRadius: '9999px',
+                              fontSize: '0.875rem',
+                              fontWeight: 500
+                            }}
+                          >
+                            {trait}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setSelectedCluster(null)}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        backgroundColor: selectedCluster.color,
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '0.5rem',
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+                      onMouseLeave={(e) => e.target.style.opacity = '1'}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           );
         };
 
+-
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<ParliamentChart />);
     </script>
