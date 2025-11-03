@@ -111,7 +111,7 @@
           const seats = useMemo(() => {
             // PERFECT 180° SEMICIRCLE - 6 rows for balanced, straight semicircle
             const rows = 6;
-            const seatsPerRow = [20, 24, 28, 33, 38, 44]; // Total = 187 seats
+            const seatsPerRow = [21, 25, 29, 34, 39, 45]; // Total = 193 seats
             const innerRadius = 170;
             const rowSpacing = 30;
             const centerX = 400;
@@ -358,12 +358,14 @@
                     bottom: 0,
                     backgroundColor: 'rgba(0, 0, 0, 0.9)',
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     justifyContent: 'center',
                     zIndex: 1000,
-                    padding: '2rem',
+                    padding: '3rem 2rem 2rem 2rem',
+                    paddingTop: '5vh',
                     backdropFilter: 'blur(8px)',
-                    animation: 'fadeIn 0.3s ease-out'
+                    animation: 'fadeIn 0.3s ease-out',
+                    overflowY: 'auto'
                   }}
                   onClick={() => setSelectedCluster(null)}
                 >
